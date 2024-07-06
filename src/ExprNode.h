@@ -7,10 +7,11 @@
 
 #include <vector>
 #include <memory>
+#include "IDMixin.hpp"
 
 namespace cas {
 
-    class ExprNode {
+    class ExprNode : public IDMiXin<ExprNode> {
     public:
         ExprNode() {
             id_ = nextId();
