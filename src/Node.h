@@ -14,7 +14,6 @@
 namespace cas {
 
 
-
     typedef bool (*validFun_t)(int, void *);
 
     class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
@@ -24,6 +23,10 @@ namespace cas {
         Node(Node &&) = delete;
 
         Node &operator=(const Node &n) = delete;
+
+        uint64_t getStatus() const {
+            return status_;
+        }
 
 
         void addChile(Node *node) {
@@ -36,6 +39,18 @@ namespace cas {
 
         [[nodiscard]]  const std::vector<Node *> getChild() const {
             return child_;
+        }
+
+        int getChildNum() const {
+            return child_.size();
+        }
+
+        const Node *getChild(int id) const {
+            return child_[id];
+        }
+
+        Node *getChild(int id) {
+            return child_[id];
         }
 
         [[nodiscard]]  int getNodeNum() const;
@@ -53,6 +68,7 @@ namespace cas {
     private:
         int type_{0};
         std::vector<Node *> child_;
+        uint64_t status_{0};
         void *value_{nullptr};
         Node *parent_{nullptr};
 
@@ -66,7 +82,81 @@ namespace cas {
 
     };
 
+    struct NodeIt {
+        NodeIt() = default;
 
+        NodeIt(Node *n, int i) : node(n), ch_index(i) {
+
+        }
+
+        Node *getCurrentNode() {
+            return node->getChild(ch_index);
+        }
+
+        Node *node{nullptr};
+        int ch_index{0};
+    };
+
+///DFS
+    class NodeIter {
+
+    public:
+        NodeIter(Node *root) {
+            index_seq.emplace_back(root, -1);
+        }
+
+        bool next() {
+            index_seq.back().ch_index++;
+            while (true) {
+                if (index_seq.size() == 1 && index_seq[0].ch_index >= index_seq[0].node->getChildNum()) {
+                    return false;
+                }
+                if (index_seq.back().ch_index >= index_seq.back().node->getChildNum()) {
+                    index_seq.pop_back();
+                    continue;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        Node *getCurrentNode() {
+            return index_seq.back().getCurrentNode();
+        }
+
+    private:
+
+        std::vector<NodeIt> index_seq;
+
+    };
+
+
+    struct Const_NodeIt {
+        Const_NodeIt() = default;
+
+        Const_NodeIt(const Node *n, int i) : node(n), ch_index(i) {
+
+        }
+
+        const Node *getCurrentNode() const {
+            return node->getChild(ch_index);
+        }
+
+        const Node *node{nullptr};
+        int ch_index{0};
+    };
+
+    class Const_NodeIter {
+
+    public:
+        const Node *getCurrentNode() const {
+            return index_seq.back().getCurrentNode();
+        }
+
+
+    private:
+        std::vector<Const_NodeIt> index_seq;
+    };
 
 
 }
