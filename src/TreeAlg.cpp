@@ -15,14 +15,15 @@ namespace cas {
         if (node->getChildNum() == 0) {
             return;
         }
-        Const_NodeIter nodeIter;
-        nodeIter.index_seq.emplace_back(node, 0);
-
-        while ((nodeIter.index_seq.back().node != node) ||
-               (nodeIter.index_seq.back().ch_index != node->getChildNum())) {
-
-
-        }
+//
+//        Const_NodeIter nodeIter(node);
+//        nodeIter.index_seq.emplace_back(node, 0);
+//
+//        while ((nodeIter.index_seq.back().node != node) ||
+//               (nodeIter.index_seq.back().ch_index != node->getChildNum())) {
+//
+//
+//        }
 
     }
 

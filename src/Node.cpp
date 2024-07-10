@@ -3,6 +3,7 @@
 //
 
 #include "Node.h"
+#include <cassert>
 
 namespace cas {
 
@@ -56,5 +57,40 @@ namespace cas {
             return d->valid();
         });
     }
+
+
+    bool NodeIter::next() {
+
+        if (index_seq.empty()) {
+            return false;
+        }
+
+        auto current = getCurrentNode();
+        assert(current);
+
+        if (current->getChildNum() > 0) {
+            index_seq.emplace_back(current->getChild(0), -1);
+            return true;
+        }
+
+        index_seq.back().ch_index++;
+
+        auto next_node = getCurrentNode();
+
+        while (next_node == nullptr) {
+            index_seq.pop_back();
+            if (index_seq.empty()) {
+                return false;
+            }
+            index_seq.back().ch_index++;
+            next_node = getCurrentNode();
+        }
+        index_seq.emplace_back(next_node, -1);
+
+        return true;
+
+
+    }
+
 
 }

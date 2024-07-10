@@ -50,6 +50,9 @@ namespace cas {
         }
 
         Node *getChild(int id) {
+            if (id >= child_.size()) {
+                return nullptr;
+            }
             return child_[id];
         }
 
@@ -90,6 +93,9 @@ namespace cas {
         }
 
         Node *getCurrentNode() {
+            if (ch_index == -1) {
+                return node;
+            }
             return node->getChild(ch_index);
         }
 
@@ -105,20 +111,7 @@ namespace cas {
             index_seq.emplace_back(root, -1);
         }
 
-        bool next() {
-            index_seq.back().ch_index++;
-            while (true) {
-                if (index_seq.size() == 1 && index_seq[0].ch_index >= index_seq[0].node->getChildNum()) {
-                    return false;
-                }
-                if (index_seq.back().ch_index >= index_seq.back().node->getChildNum()) {
-                    index_seq.pop_back();
-                    continue;
-                }
-                return true;
-            }
-            return false;
-        }
+        bool next();
 
         Node *getCurrentNode() {
             return index_seq.back().getCurrentNode();
