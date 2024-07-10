@@ -16,7 +16,7 @@ namespace cas {
             return;
         }
 //
-//        Const_NodeIter nodeIter(node);
+//        ConstDFSNodeIter nodeIter(node);
 //        nodeIter.index_seq.emplace_back(node, 0);
 //
 //        while ((nodeIter.index_seq.back().node != node) ||

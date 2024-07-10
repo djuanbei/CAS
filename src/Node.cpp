@@ -59,7 +59,7 @@ namespace cas {
     }
 
 
-    bool NodeIter::next() {
+    bool NodeDFSIter::next() {
 
         if (index_seq.empty()) {
             return false;
@@ -92,7 +92,7 @@ namespace cas {
 
     }
 
-    bool Const_NodeIter::next() {
+    bool ConstDFSNodeIter::next() {
         if (index_seq.empty()) {
             return false;
         }

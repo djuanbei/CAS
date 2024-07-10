@@ -104,10 +104,10 @@ namespace cas {
     };
 
 ///DFS
-    class NodeIter {
+    class NodeDFSIter {
 
     public:
-        NodeIter(Node *root) {
+        explicit NodeDFSIter(Node *root) {
             index_seq.emplace_back(root, -1);
         }
 
@@ -124,10 +124,10 @@ namespace cas {
     };
 
 
-    struct Const_NodeIt {
-        Const_NodeIt() = default;
+    struct ConstDFSNodeIt {
+        ConstDFSNodeIt() = default;
 
-        Const_NodeIt(const Node *n, int i) : node(n), ch_index(i) {
+        ConstDFSNodeIt(const Node *n, int i) : node(n), ch_index(i) {
 
         }
 
@@ -139,23 +139,23 @@ namespace cas {
         int ch_index{0};
     };
 
-    class Const_NodeIter {
+    class ConstDFSNodeIter {
 
     public:
 
-        Const_NodeIter(Node *root) {
+        explicit ConstDFSNodeIter(Node *root) {
             index_seq.emplace_back(root, -1);
         }
 
         bool next();
 
-        const Node *getCurrentNode() const {
+        [[nodiscard]] const Node *getCurrentNode() const {
             return index_seq.back().getCurrentNode();
         }
 
 
     private:
-        std::vector<Const_NodeIt> index_seq;
+        std::vector<ConstDFSNodeIt> index_seq;
     };
 
 
