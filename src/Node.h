@@ -142,6 +142,13 @@ namespace cas {
     class Const_NodeIter {
 
     public:
+
+        Const_NodeIter(Node *root) {
+            index_seq.emplace_back(root, -1);
+        }
+
+        bool next();
+
         const Node *getCurrentNode() const {
             return index_seq.back().getCurrentNode();
         }
