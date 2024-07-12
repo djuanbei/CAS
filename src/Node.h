@@ -16,6 +16,9 @@ namespace cas {
 
     typedef bool (*validFun_t)(int, void *);
 
+    typedef std::ostream& (*dumpFun_t)(std::ostream &, int tab_indent, const void *);
+
+
     class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     public:
         Node(const Node &) = delete;
@@ -29,12 +32,16 @@ namespace cas {
         }
 
 
-        void addChile(Node *node) {
+        void addChild(Node *node) {
             child_.emplace_back(node);
         }
 
         void setValueValidFun(validFun_t fun) {
             value_valid_fun = fun;
+        }
+
+        void setValueDumpDun(dumpFun_t fun) {
+            value_dump_fun = fun;
         }
 
         [[nodiscard]]  const std::vector<Node *> getChild() const {
@@ -62,13 +69,23 @@ namespace cas {
 
         [[nodiscard]]  int getDepth() const;
 
+        friend Node *createNode();
 
-        std::ostream &dump(std::ostream &out) const override;
+        friend Node *createNode(void *v);
+
+
+        std::ostream &dump(std::ostream &out, int tab_indent = 0) const override;
 
         [[nodiscard]] bool valid() const override;
 
 
     private:
+        Node() = default;
+
+        Node(void *v) : value_(v) {
+
+        }
+
         int type_{0};
         std::vector<Node *> child_;
         uint64_t status_{0};
@@ -76,6 +93,7 @@ namespace cas {
         Node *parent_{nullptr};
 
         validFun_t value_valid_fun{nullptr};
+        dumpFun_t value_dump_fun{nullptr};
 
 
         static int nextId() {
@@ -84,6 +102,7 @@ namespace cas {
         }
 
     };
+
 
     struct NodeIt {
         NodeIt() = default;
@@ -157,6 +176,10 @@ namespace cas {
     private:
         std::vector<ConstDFSNodeIt> index_seq;
     };
+
+    Node *createNode();
+
+    Node *createNode(void *v);
 
 
 }

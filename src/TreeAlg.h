@@ -9,6 +9,8 @@
 
 namespace cas {
 
+    Node *generateTree(int node_num, int degree, int depth);
+
 
     typedef bool (*nodeCheck_t)(const Node *);
 

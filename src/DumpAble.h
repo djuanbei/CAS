@@ -13,7 +13,7 @@ namespace cas {
     public:
         virtual ~DumpAble() = default;
 
-        virtual std::ostream &dump(std::ostream &out) const = 0;
+        virtual std::ostream &dump(std::ostream &out, int tab_indent) const = 0;
     };
 
 }

@@ -4,8 +4,20 @@
 
 #include "Node.h"
 #include <cassert>
+#include <string>
 
 namespace cas {
+
+    using namespace std;
+
+    Node *createNode() {
+        return new Node();
+    }
+
+    Node *createNode(void *v) {
+        return new Node(v);
+    }
+
 
     int Node::getNodeNum() const {
         int num = 1;
@@ -58,6 +70,25 @@ namespace cas {
         });
     }
 
+    std::ostream &Node::dump(std::ostream &out, int tab_indent) const {
+        out << string(tab_indent, '\t');
+        out << "ID: " << getId() << ", " << "type: " << type_ << ", " << ", status: " << status_;
+
+        if (value_dump_fun) {
+            value_dump_fun(out, 1, value_);
+        }
+
+        for (auto d: child_) {
+            out << "\n";
+            d->dump(out, tab_indent + 1);
+        }
+        out << "\n";
+
+        return out;
+
+
+    }
+
 
     bool NodeDFSIter::next() {
 
@@ -69,7 +100,7 @@ namespace cas {
         assert(current);
 
         if (current->getChildNum() > 0) {
-            index_seq.emplace_back(current->getChild(0), -1);
+            index_seq.emplace_back(current->getChild(0), 0);
             return true;
         }
 
