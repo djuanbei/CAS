@@ -77,15 +77,12 @@ namespace cas {
         if (value_dump_fun) {
             value_dump_fun(out, 1, value_);
         }
-
+        out << "\n";
         for (auto d: child_) {
-            out << "\n";
             d->dump(out, tab_indent + 1);
         }
-        out << "\n";
 
         return out;
-
 
     }
 
@@ -109,35 +106,58 @@ namespace cas {
 
 
     bool NodeDFSIter::next() {
-
         if (index_seq.empty()) {
             return false;
         }
 
         auto current = getCurrentNode();
-        assert(current);
 
-        if (current->getChildNum() > 0) {
-            index_seq.emplace_back(current->getChild(0), 0);
+        assert(current);
+        if (index_seq.size() == 1 && index_seq[0].ch_index == -2) {
+            index_seq[0].ch_index = -1;
             return true;
         }
 
-        index_seq.back().ch_index++;
-
-        auto next_node = getCurrentNode();
-
-        while (next_node == nullptr) {
-            index_seq.pop_back();
-            if (index_seq.empty()) {
-                return false;
+        if (index_seq.size() == 1 && index_seq[0].ch_index == -1) {
+            if (current->getChildNum() > 0) {
+                index_seq[0].ch_index = 0;
+                return true;
             }
-            index_seq.back().ch_index++;
-            next_node = getCurrentNode();
+            return false;
         }
-        index_seq.emplace_back(next_node, -1);
 
-        return true;
 
+        if (current->getChildNum() > 0) {
+            downChild();
+            return true;
+        }
+        while (!index_seq.empty()) {
+            if (index_seq.back().withNextSlide()) {
+                nextSlide();
+                return true;
+            }
+            upParent();
+        }
+        return false;
+
+
+    }
+
+    void ConstDFSNodeIter::nextSlide() {
+        index_seq.back().ch_index++;
+        assert(index_seq.back().ch_index < index_seq.back().node->getChildNum());
+    }
+
+    void ConstDFSNodeIter::downChild() {
+        auto current = getCurrentNode();
+        assert(current);
+        assert(current->getChildNum() > 0);
+        index_seq.emplace_back(current, 0);
+    }
+
+    void ConstDFSNodeIter::upParent() {
+        assert(!index_seq.empty());
+        index_seq.pop_back();
 
     }
 
@@ -147,28 +167,34 @@ namespace cas {
         }
 
         auto current = getCurrentNode();
-        assert(current);
 
-        if (current->getChildNum() > 0) {
-            index_seq.emplace_back(current->getChild(0), -1);
+        assert(current);
+        if (index_seq.size() == 1 && index_seq[0].ch_index == -2) {
+            index_seq[0].ch_index = -1;
             return true;
         }
 
-        index_seq.back().ch_index++;
-
-        auto next_node = getCurrentNode();
-
-        while (next_node == nullptr) {
-            index_seq.pop_back();
-            if (index_seq.empty()) {
-                return false;
+        if (index_seq.size() == 1 && index_seq[0].ch_index == -1) {
+            if (current->getChildNum() > 0) {
+                index_seq[0].ch_index = 0;
+                return true;
             }
-            index_seq.back().ch_index++;
-            next_node = getCurrentNode();
+            return false;
         }
-        index_seq.emplace_back(next_node, -1);
 
-        return true;
+
+        if (current->getChildNum() > 0) {
+            downChild();
+            return true;
+        }
+        while (!index_seq.empty()) {
+            if (index_seq.back().withNextSlide()) {
+                nextSlide();
+                return true;
+            }
+            upParent();
+        }
+        return false;
 
 
     }

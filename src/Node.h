@@ -27,6 +27,10 @@ namespace cas {
 
         Node &operator=(const Node &n) = delete;
 
+        const void *getValue() const {
+            return value_;
+        }
+
         uint64_t getStatus() const {
             return status_;
         }
@@ -112,10 +116,14 @@ namespace cas {
         }
 
         Node *getCurrentNode() {
-            if (ch_index == -1) {
+            if (ch_index < 0) {
                 return node;
             }
             return node->getChild(ch_index);
+        }
+
+        bool withNextSlide() const {
+            return ch_index + 1 < node->getChildNum();
         }
 
         Node *node{nullptr};
@@ -129,7 +137,7 @@ namespace cas {
 
     public:
         explicit NodeDFSIter(Node *root) {
-            index_seq.emplace_back(root, -1);
+            index_seq.emplace_back(root, -2);
         }
 
         bool next();
@@ -162,6 +170,11 @@ namespace cas {
             return node->getChild(ch_index);
         }
 
+        bool withNextSlide() const {
+            return ch_index + 1 < node->getChildNum();
+        }
+
+
         const Node *node{nullptr};
         int ch_index{0};
     };
@@ -171,8 +184,15 @@ namespace cas {
     public:
 
         explicit ConstDFSNodeIter(Node *root) {
-            index_seq.emplace_back(root, -1);
+            index_seq.emplace_back(root, -2);
         }
+
+        void nextSlide();
+
+        void downChild();
+
+        void upParent();
+
 
         bool next();
 
