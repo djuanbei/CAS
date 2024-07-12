@@ -16,7 +16,7 @@ namespace cas {
 
     typedef bool (*validFun_t)(int, void *);
 
-    typedef std::ostream& (*dumpFun_t)(std::ostream &, int tab_indent, const void *);
+    typedef std::ostream &(*dumpFun_t)(std::ostream &, int tab_indent, const void *);
 
 
     class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
@@ -120,6 +120,8 @@ namespace cas {
 
         Node *node{nullptr};
         int ch_index{0};
+
+
     };
 
 ///DFS
@@ -135,6 +137,12 @@ namespace cas {
         Node *getCurrentNode() {
             return index_seq.back().getCurrentNode();
         }
+
+        void nextSlide();
+
+        void downChild();
+
+        void upParent();
 
     private:
 

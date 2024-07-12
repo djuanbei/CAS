@@ -89,6 +89,24 @@ namespace cas {
 
     }
 
+    void NodeDFSIter::nextSlide() {
+        index_seq.back().ch_index++;
+        assert(index_seq.back().ch_index < index_seq.back().node->getChildNum());
+    }
+
+    void NodeDFSIter::downChild() {
+        auto current = getCurrentNode();
+        assert(current);
+        assert(current->getChildNum() > 0);
+        index_seq.emplace_back(current, 0);
+    }
+
+    void NodeDFSIter::upParent() {
+        assert(!index_seq.empty());
+        index_seq.pop_back();
+
+    }
+
 
     bool NodeDFSIter::next() {
 
