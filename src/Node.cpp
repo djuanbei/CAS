@@ -81,7 +81,6 @@ namespace cas {
         for (auto d: child_) {
             d->dump(out, tab_indent + 1);
         }
-
         return out;
 
     }
