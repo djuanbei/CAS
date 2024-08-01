@@ -13,204 +13,199 @@
 
 namespace cas {
 
+typedef bool (*validFun_t)(int, void *);
 
-    typedef bool (*validFun_t)(int, void *);
+typedef std::ostream &(*dumpFun_t)(std::ostream &, int tab_indent, const void *);
 
-    typedef std::ostream &(*dumpFun_t)(std::ostream &, int tab_indent, const void *);
+class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
+ public:
+  Node(const Node &) = delete;
 
+  Node(Node &&) = delete;
 
-    class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
-    public:
-        Node(const Node &) = delete;
+  Node &operator=(const Node &n) = delete;
 
-        Node(Node &&) = delete;
+  const void *getValue() const {
+    return value_;
+  }
 
-        Node &operator=(const Node &n) = delete;
+  uint64_t getStatus() const {
+    return status_;
+  }
 
-        const void *getValue() const {
-            return value_;
-        }
+  void addChild(Node *node) {
+    child_.emplace_back(node);
+  }
 
-        uint64_t getStatus() const {
-            return status_;
-        }
+  void setValueValidFun(validFun_t fun) {
+    value_valid_fun = fun;
+  }
 
+  void setValueDumpDun(dumpFun_t fun) {
+    value_dump_fun = fun;
+  }
 
-        void addChild(Node *node) {
-            child_.emplace_back(node);
-        }
+  [[nodiscard]]  const std::vector<Node *> getChild() const {
+    return child_;
+  }
 
-        void setValueValidFun(validFun_t fun) {
-            value_valid_fun = fun;
-        }
+  int getChildNum() const {
+    return child_.size();
+  }
 
-        void setValueDumpDun(dumpFun_t fun) {
-            value_dump_fun = fun;
-        }
+  const Node *getChild(int id) const {
+    return child_[id];
+  }
 
-        [[nodiscard]]  const std::vector<Node *> getChild() const {
-            return child_;
-        }
+  Node *getChild(int id) {
+    if (id >= child_.size()) {
+      return nullptr;
+    }
+    return child_[id];
+  }
 
-        int getChildNum() const {
-            return child_.size();
-        }
+  [[nodiscard]]  int getNodeNum() const;
 
-        const Node *getChild(int id) const {
-            return child_[id];
-        }
+  [[nodiscard]]  int getLeafNodeNum() const;
 
-        Node *getChild(int id) {
-            if (id >= child_.size()) {
-                return nullptr;
-            }
-            return child_[id];
-        }
+  [[nodiscard]]  int getDepth() const;
+  friend class NodeManager;
 
-        [[nodiscard]]  int getNodeNum() const;
+  std::ostream &dump(std::ostream &out, int tab_indent = 0) const override;
 
-        [[nodiscard]]  int getLeafNodeNum() const;
+  [[nodiscard]] bool valid() const override;
 
-        [[nodiscard]]  int getDepth() const;
+ private:
+  Node() = default;
 
-        friend Node *createNode();
+  Node(void *v) : value_(v) {
 
-        friend Node *createNode(void *v);
+  }
 
+  int type_{0};
+  std::vector<Node *> child_;
+  uint64_t status_{0};
+  void *value_{nullptr};
+  Node *parent_{nullptr};
 
-        std::ostream &dump(std::ostream &out, int tab_indent = 0) const override;
+  validFun_t value_valid_fun{nullptr};
+  dumpFun_t value_dump_fun{nullptr};
 
-        [[nodiscard]] bool valid() const override;
+  static int nextId() {
+    static int global_id = 0;
+    return global_id++;
+  }
 
+};
 
-    private:
-        Node() = default;
+class NodeManager {
 
-        Node(void *v) : value_(v) {
+ public:
+  Node *createNode();
 
-        }
+  Node *createNode(void *v);
 
-        int type_{0};
-        std::vector<Node *> child_;
-        uint64_t status_{0};
-        void *value_{nullptr};
-        Node *parent_{nullptr};
+ private:
+  std::vector<Node *> node_vec_;
 
-        validFun_t value_valid_fun{nullptr};
-        dumpFun_t value_dump_fun{nullptr};
+};
 
+struct NodeIt {
+  NodeIt() = default;
 
-        static int nextId() {
-            static int global_id = 0;
-            return global_id++;
-        }
+  NodeIt(Node *n, int i) : node(n), ch_index(i) {
 
-    };
+  }
 
+  Node *getCurrentNode() {
+    if (ch_index < 0) {
+      return node;
+    }
+    return node->getChild(ch_index);
+  }
 
-    struct NodeIt {
-        NodeIt() = default;
+  bool withNextSlide() const {
+    return ch_index + 1 < node->getChildNum();
+  }
 
-        NodeIt(Node *n, int i) : node(n), ch_index(i) {
+  Node *node{nullptr};
+  int ch_index{0};
 
-        }
-
-        Node *getCurrentNode() {
-            if (ch_index < 0) {
-                return node;
-            }
-            return node->getChild(ch_index);
-        }
-
-        bool withNextSlide() const {
-            return ch_index + 1 < node->getChildNum();
-        }
-
-        Node *node{nullptr};
-        int ch_index{0};
-
-
-    };
+};
 
 ///DFS
-    class NodeDFSIter {
+class NodeDFSIter {
 
-    public:
-        explicit NodeDFSIter(Node *root) {
-            index_seq.emplace_back(root, -2);
-        }
+ public:
+  explicit NodeDFSIter(Node *root) {
+    index_seq.emplace_back(root, -2);
+  }
 
-        bool next();
+  bool next();
 
-        Node *getCurrentNode() {
-            return index_seq.back().getCurrentNode();
-        }
+  Node *getCurrentNode() {
+    return index_seq.back().getCurrentNode();
+  }
 
-        void nextSlide();
+  void nextSlide();
 
-        void downChild();
+  void downChild();
 
-        void upParent();
+  void upParent();
 
-    private:
+ private:
 
-        std::vector<NodeIt> index_seq;
+  std::vector<NodeIt> index_seq;
 
-    };
+};
 
+struct ConstDFSNodeIt {
+  ConstDFSNodeIt() = default;
 
-    struct ConstDFSNodeIt {
-        ConstDFSNodeIt() = default;
+  ConstDFSNodeIt(const Node *n, int i) : node(n), ch_index(i) {
 
-        ConstDFSNodeIt(const Node *n, int i) : node(n), ch_index(i) {
+  }
 
-        }
+  const Node *getCurrentNode() const {
+    return node->getChild(ch_index);
+  }
 
-        const Node *getCurrentNode() const {
-            return node->getChild(ch_index);
-        }
+  bool withNextSlide() const {
+    return ch_index + 1 < node->getChildNum();
+  }
 
-        bool withNextSlide() const {
-            return ch_index + 1 < node->getChildNum();
-        }
+  const Node *node{nullptr};
+  int ch_index{0};
+};
 
+class ConstDFSNodeIter {
 
-        const Node *node{nullptr};
-        int ch_index{0};
-    };
+ public:
 
-    class ConstDFSNodeIter {
+  explicit ConstDFSNodeIter(Node *root) {
+    index_seq.emplace_back(root, -2);
+  }
 
-    public:
+  void nextSlide();
 
-        explicit ConstDFSNodeIter(Node *root) {
-            index_seq.emplace_back(root, -2);
-        }
+  void downChild();
 
-        void nextSlide();
+  void upParent();
 
-        void downChild();
+  bool next();
 
-        void upParent();
+  [[nodiscard]] const Node *getCurrentNode() const {
+    return index_seq.back().getCurrentNode();
+  }
 
+ private:
+  std::vector<ConstDFSNodeIt> index_seq;
+};
 
-        bool next();
-
-        [[nodiscard]] const Node *getCurrentNode() const {
-            return index_seq.back().getCurrentNode();
-        }
-
-
-    private:
-        std::vector<ConstDFSNodeIt> index_seq;
-    };
-
-    Node *createNode();
-
-    Node *createNode(void *v);
-
+//Node *createNode();
+//
+//Node *createNode(void *v);
 
 }
-
 
 #endif //CAS_NODE_H
