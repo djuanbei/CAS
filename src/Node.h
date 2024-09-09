@@ -5,17 +5,22 @@
 #ifndef CAS_NODE_H
 #define CAS_NODE_H
 
-#include <vector>
-#include <memory>
 #include "IDMixin.hpp"
 #include "ValidAble.h"
 #include "DumpAble.h"
+//
+
+#include <vector>
+#include <memory>
+#include <functional>
 
 namespace cas {
 
 typedef bool (*validFun_t)(int, void *);
 
 typedef std::ostream &(*dumpFun_t)(std::ostream &, int tab_indent, const void *);
+
+typedef void  (*valueDesFun_t)(void *);
 
 class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
  public:
@@ -27,6 +32,10 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 
   const void *getValue() const {
     return value_;
+  }
+  void releaseValue(const std::function<void(void *)> &d_fun) {
+    d_fun(value_);
+    value_ = nullptr;
   }
 
   uint64_t getStatus() const {
@@ -41,8 +50,12 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     value_valid_fun = fun;
   }
 
-  void setValueDumpDun(dumpFun_t fun) {
+  void setValueDumpFun(dumpFun_t fun) {
     value_dump_fun = fun;
+  }
+
+  void setValueDesFun(valueDesFun_t fun) {
+    value_des_fun = fun;
   }
 
   [[nodiscard]]  const std::vector<Node *> getChild() const {
@@ -63,12 +76,29 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     }
     return child_[id];
   }
+  bool isLeaf() const {
+    return 0 == getChildNum();
+  }
 
   [[nodiscard]]  int getNodeNum() const;
 
   [[nodiscard]]  int getLeafNodeNum() const;
 
+  [[nodiscard]]  int getNodeNumWithStatus(uint64_t status) const;
+
+  [[nodiscard]]  int getLeafNodeNumStatus(uint64_t status) const;
+
   [[nodiscard]]  int getDepth() const;
+  /**
+   * @return true iff there is node been removed
+   */
+
+  bool removeNodeWithStatus(uint64_t status);
+/**
+   * @return true iff there is node been removed
+   */
+  bool removeLeafNodeWithStatus(uint64_t status, bool recursive = true);
+
   friend class NodeManager;
 
   std::ostream &dump(std::ostream &out, int tab_indent = 0) const override;
@@ -78,7 +108,7 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
  private:
   Node() = default;
 
-  Node(void *v) : value_(v) {
+  explicit Node(void *v) : value_(v) {
 
   }
 
@@ -91,6 +121,8 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
   validFun_t value_valid_fun{nullptr};
   dumpFun_t value_dump_fun{nullptr};
 
+  valueDesFun_t value_des_fun{nullptr};
+
   static int nextId() {
     static int global_id = 0;
     return global_id++;
@@ -101,12 +133,22 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 class NodeManager {
 
  public:
+  NodeManager() = default;
+  NodeManager(std::function<void(void *)> d_fun) : value_des_fun_(std::move(d_fun)) {
+
+  }
+  ~NodeManager();
   Node *createNode();
 
   Node *createNode(void *v);
 
+  void setValueDesFun(const std::function<void(void *)> &d_fun) {
+    value_des_fun_ = std::move(d_fun);
+  }
+
  private:
   std::vector<Node *> node_vec_;
+  std::function<void(void *)> value_des_fun_{nullptr};
 
 };
 

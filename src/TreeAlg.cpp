@@ -30,7 +30,7 @@ Node *build(NodeManager &manager, const std::vector<int> &value, int &i, int lev
   auto dump = [](std::ostream &out, int tab_indent, const void *v) -> std::ostream & {
     return out << string(tab_indent, '\t') << ", value: " << (*((int *) v));
   };
-  re->setValueDumpDun(dump);
+  re->setValueDumpFun(dump);
 
   return re;
 

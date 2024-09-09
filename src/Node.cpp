@@ -31,6 +31,30 @@ int Node::getLeafNodeNum() const {
   return num;
 }
 
+int Node::getNodeNumWithStatus(uint64_t status) const {
+  int num = 0;
+  if (getStatus() == status) {
+    num++;
+  }
+  for (auto d : child_) {
+    num += getNodeNumWithStatus(status);
+  }
+  return num;
+
+}
+
+int Node::getLeafNodeNumStatus(uint64_t status) const {
+  if (child_.empty()) {
+    return getStatus() == status ? 1 : 0;
+  }
+  int num = 0;
+  for (auto d : child_) {
+    num += getLeafNodeNumStatus(status);
+  }
+  return num;
+
+}
+
 int Node::getDepth() const {
 
   int level = 0;
@@ -40,6 +64,58 @@ int Node::getDepth() const {
   }
 
   return level + 1;
+}
+
+/**
+  * @return true iff there is node been removed
+  */
+
+bool Node::removeNodeWithStatus(uint64_t status) {
+  auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+    return d->getStatus() == status;
+  });
+  bool re = false;
+  if (it != child_.end()) {
+    re = true;
+  }
+  child_.resize(it - child_.begin());
+  for (auto d : child_) {
+    if (d->removeLeafNodeWithStatus(status)) {
+      re = true;
+    }
+  }
+  return re;
+}
+/**
+   * @return true iff there is node been removed
+   */
+bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
+  auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+    return d->isLeaf() && d->getStatus() == status;
+  });
+
+  bool direct_re = false;
+  if (it != child_.end()) {
+    direct_re = true;
+  }
+
+  child_.resize(it - child_.begin());
+  bool ch_re = false;
+  for (auto d : child_) {
+    if (d->removeLeafNodeWithStatus(status, recursive)) {
+      ch_re = true;
+    }
+  }
+
+  if (ch_re) {
+    it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+      return d->isLeaf() && d->getStatus() == status;
+    });
+    child_.resize(it - child_.begin());
+  }
+
+  return direct_re || ch_re;
+
 }
 
 bool Node::valid() const {
@@ -183,6 +259,18 @@ bool ConstDFSNodeIter::next() {
 
 }
 
+NodeManager::~NodeManager() {
+  if (value_des_fun_) {
+    for (auto &n : node_vec_) {
+      n->releaseValue(value_des_fun_);
+    }
+  }
+  for (auto n : node_vec_) {
+    delete n;
+  }
+  node_vec_.clear();
+
+}
 Node *NodeManager::createNode() {
   auto re = new Node();
   node_vec_.emplace_back(re);
