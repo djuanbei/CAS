@@ -13,11 +13,14 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <cassert>
 
 namespace cas {
 class Node;
 
 typedef bool (*validFun_t)(int, void *);
+
+typedef bool (*compareFun_t)(const Node *, const Node *);
 
 typedef std::ostream &(*dumpFun_t)(std::ostream &, int tab_indent, const void *);
 
@@ -33,7 +36,7 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 
   Node &operator=(const Node &n) = delete;
 
-  const void *getValue() const {
+  [[nodiscard]] const void *getValue() const {
     return value_;
   }
   void releaseValue(const std::function<void(void *)> &d_fun) {
@@ -41,11 +44,12 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     value_ = nullptr;
   }
 
-  uint64_t getStatus() const {
+  [[nodiscard]] uint64_t getStatus() const {
     return status_;
   }
 
   void addChild(Node *node) {
+    node->parent_ = this;
     child_.emplace_back(node);
   }
 
@@ -81,9 +85,11 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     }
     return child_[id];
   }
-  bool isLeaf() const {
+  [[nodiscard]] bool isLeaf() const {
     return 0 == getChildNum();
   }
+
+  void norm(compareFun_t fun);
 
   [[nodiscard]]  int getNodeNum() const;
 

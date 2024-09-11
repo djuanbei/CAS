@@ -17,6 +17,13 @@ void Node::removeChild(int index) {
   ch->parent_ = nullptr;
 }
 
+void Node::norm(compareFun_t fun) {
+  for (auto ch : child_) {
+    ch->norm(fun);
+  }
+  std::stable_sort(child_.begin(), child_.end(), fun);
+}
+
 int Node::getNodeNum() const {
   int num = 1;
   for (auto &d : child_) {
