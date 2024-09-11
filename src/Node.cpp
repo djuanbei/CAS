@@ -10,6 +10,13 @@ namespace cas {
 
 using namespace std;
 
+void Node::removeChild(int index) {
+  assert(index >= 0 && index < child_.size());
+  auto ch = child_[index];
+  child_.erase(child_.begin() + index);
+  ch->parent_ = nullptr;
+}
+
 int Node::getNodeNum() const {
   int num = 1;
   for (auto &d : child_) {
@@ -72,7 +79,11 @@ int Node::getDepth() const {
 
 bool Node::removeNodeWithStatus(uint64_t status) {
   auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
-    return d->getStatus() == status;
+    if (d->getStatus() == status) {
+      d->parent_ = nullptr;
+      return true;
+    }
+    return false;
   });
   bool re = false;
   if (it != child_.end()) {
@@ -91,7 +102,11 @@ bool Node::removeNodeWithStatus(uint64_t status) {
    */
 bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
   auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
-    return d->isLeaf() && d->getStatus() == status;
+    if (d->isLeaf() && d->getStatus() == status) {
+      d->parent_ = nullptr;
+      return true;
+    }
+    return false;
   });
 
   bool direct_re = false;
@@ -109,7 +124,75 @@ bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
 
   if (ch_re) {
     it = remove_if(child_.begin(), child_.end(), [=](auto d) {
-      return d->isLeaf() && d->getStatus() == status;
+      if (d->isLeaf() && d->getStatus() == status) {
+        d->parent_ = nullptr;
+        return true;
+      }
+      return false;
+    });
+    child_.resize(it - child_.begin());
+  }
+
+  return direct_re || ch_re;
+
+}
+
+/**
+ *  remove node when fun(n) hold
+ */
+bool Node::removeNode(checkFun_t fun) {
+  auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+    if (fun(d)) {
+      d->parent_ = nullptr;
+      return true;
+    }
+    return false;
+  });
+  bool re = false;
+  if (it != child_.end()) {
+    re = true;
+  }
+  for (auto d : child_) {
+    if (d->removeNode(fun)) {
+      re = true;
+    }
+  }
+  return re;
+}
+/**
+ * remove leaf node when fun(n) hold
+ */
+
+bool Node::removeLeafNode(checkFun_t fun, bool recursive) {
+
+  auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+    if (d->isLeaf() && fun(d)) {
+      d->parent_ = nullptr;
+      return true;
+    }
+    return false;
+  });
+
+  bool direct_re = false;
+  if (it != child_.end()) {
+    direct_re = true;
+  }
+
+  child_.resize(it - child_.begin());
+  bool ch_re = false;
+  for (auto d : child_) {
+    if (d->removeLeafNode(fun, recursive)) {
+      ch_re = true;
+    }
+  }
+
+  if (ch_re) {
+    it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+      if (d->isLeaf() && fun(d)) {
+        d->parent_ = nullptr;
+        return true;
+      }
+      return false;
     });
     child_.resize(it - child_.begin());
   }

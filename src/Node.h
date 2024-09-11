@@ -15,12 +15,15 @@
 #include <functional>
 
 namespace cas {
+class Node;
 
 typedef bool (*validFun_t)(int, void *);
 
 typedef std::ostream &(*dumpFun_t)(std::ostream &, int tab_indent, const void *);
 
 typedef void  (*valueDesFun_t)(void *);
+
+typedef bool (*checkFun_t)(const Node *);
 
 class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
  public:
@@ -45,6 +48,8 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
   void addChild(Node *node) {
     child_.emplace_back(node);
   }
+
+  void removeChild(int index);
 
   void setValueValidFun(validFun_t fun) {
     value_valid_fun = fun;
@@ -99,6 +104,16 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
    */
   bool removeLeafNodeWithStatus(uint64_t status, bool recursive = true);
 
+  /**
+   *  remove node when fun(n) hold
+   */
+  bool removeNode(checkFun_t fun);
+  /**
+   * remove leaf node when fun(n) hold
+   */
+
+  bool removeLeafNode(checkFun_t fun, bool recursive = true);
+
   friend class NodeManager;
 
   std::ostream &dump(std::ostream &out, int tab_indent = 0) const override;
@@ -129,6 +144,47 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
   }
 
 };
+
+static inline std::pair<Node *, bool> removeNodeWithStatus(Node *node, uint64_t statue) {
+  assert(node);
+  if (node->getStatus() == statue) {
+    return {nullptr, true};
+  }
+  auto re = node->removeNodeWithStatus(statue);
+  return {node, re};
+}
+
+static inline std::pair<Node *, bool> removeLeafNodeWithStatus(Node *node, uint64_t status, bool recursive = true) {
+  assert(node);
+  if (node->isLeaf() && node->getStatus() == status) {
+    return {nullptr, true};
+  }
+  auto re = node->removeLeafNodeWithStatus(status, recursive);
+  return {node, re};
+}
+
+static inline std::pair<Node *, bool> removeNode(Node *node, checkFun_t fun) {
+  assert(node);
+  if (fun(node)) {
+    return {nullptr, true};
+  }
+  auto re = node->removeNode(fun);
+  return {node, re};
+}
+
+/**
+  * remove leaf node when fun(n) hold
+  */
+
+static inline std::pair<Node *, bool> removeLeafNode(Node *node, checkFun_t fun, bool recursive = true) {
+  assert(node);
+  if (node->isLeaf() && fun(node)) {
+    return {nullptr, true};
+  }
+  auto re = node->removeLeafNode(fun, recursive);
+  return {node, re};
+
+}
 
 class NodeManager {
 
