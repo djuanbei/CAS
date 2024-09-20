@@ -52,6 +52,10 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     return status_;
   }
 
+  void setStatus(uint64_t s) {
+    status_ = s;
+  }
+
   void addChild(Node *node) {
     node->parent_ = this;
     child_.emplace_back(node);
@@ -165,7 +169,7 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 
   int type_{0};
   std::vector<Node *> child_;
-  uint64_t status_{0};
+  mutable uint64_t status_{0};
   void *value_{nullptr};
   Node *parent_{nullptr};
 

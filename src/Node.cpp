@@ -117,7 +117,7 @@ void Node::getAllNodeWithStatus(std::vector<Node *> &nodes, uint64_t status) con
     if (d->getStatus() == status) {
       nodes.emplace_back(d);
     }
-    d->getAllNodeWithStatus(nodes);
+    d->getAllNodeWithStatus(nodes, status);
   }
 
 }
