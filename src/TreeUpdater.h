@@ -8,6 +8,9 @@
 #include <vector>
 #include <memory>
 namespace cas {
+/**
+ * Update node by the member of node of member of direct child
+ */
 
 class NodeUpdater {
 

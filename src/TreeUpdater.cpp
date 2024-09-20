@@ -65,7 +65,6 @@ void update(Node *root, const std::vector<std::shared_ptr<const NodeUpdater>> &u
           }
           jt++;
         }
-
       } else {
         for (auto &u : universal_listener) {
           if (u->handle(n)) {
