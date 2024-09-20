@@ -312,7 +312,7 @@ class NodeManager {
 struct NodeIt {
   NodeIt() = default;
 
-  NodeIt(Node *n, size_t i) : node(n), ch_index(i) {
+  NodeIt(Node *n, int i) : node(n), ch_index(i) {
 
   }
 
@@ -328,7 +328,7 @@ struct NodeIt {
   }
 
   Node *node{nullptr};
-  size_t ch_index{0};
+  int ch_index{0};
 
 };
 
@@ -361,7 +361,7 @@ class NodeDFSIter {
 struct ConstDFSNodeIt {
   ConstDFSNodeIt() = default;
 
-  ConstDFSNodeIt(const Node *n, size_t i) : node(n), ch_index(i) {
+  ConstDFSNodeIt(const Node *n, int i) : node(n), ch_index(i) {
 
   }
 
@@ -374,7 +374,7 @@ struct ConstDFSNodeIt {
   }
 
   const Node *node{nullptr};
-  size_t ch_index{0};
+  int ch_index{0};
 };
 
 class ConstDFSNodeIter {

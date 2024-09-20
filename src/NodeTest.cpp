@@ -10,9 +10,9 @@ using namespace testing;
 using namespace cas;
 using namespace std;
 
-TEST(Node, simple) {
+TEST(Node, DFS_simple) {
   NodeManager node_manager;
-  Node *root = generateTree(node_manager, 20, 3, 3);
+  Node *root = generateTree(node_manager, 30, 4, 5);
 
   root->dump(cout, 0);
 
@@ -23,4 +23,8 @@ TEST(Node, simple) {
   }
 
 }
+
+
+
+
 
