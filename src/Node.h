@@ -44,6 +44,10 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     value_ = nullptr;
   }
 
+  int getType() const {
+    return type_;
+  }
+
   [[nodiscard]] uint64_t getStatus() const {
     return status_;
   }
@@ -53,7 +57,7 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     child_.emplace_back(node);
   }
 
-  void removeChild(int index);
+  void removeChild(size_t ndex);
 
   void setValueValidFun(validFun_t fun) {
     value_valid_fun = fun;
@@ -71,22 +75,31 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
     return child_;
   }
 
-  int getChildNum() const {
+  size_t getChildNum() const {
     return child_.size();
   }
 
-  const Node *getChild(int id) const {
+  const Node *getChild(size_t id) const {
     return child_[id];
   }
 
-  Node *getChild(int id) {
+  Node *getChild(size_t id) {
     if (id >= child_.size()) {
       return nullptr;
     }
     return child_[id];
   }
+
   [[nodiscard]] bool isLeaf() const {
     return 0 == getChildNum();
+  }
+
+  Node *getParent() {
+    return parent_;
+  }
+
+  const Node *getParent() const {
+    return parent_;
   }
 
   void norm(compareFun_t fun);
@@ -97,7 +110,11 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 
   [[nodiscard]]  int getNodeNumWithStatus(uint64_t status) const;
 
-  [[nodiscard]]  int getLeafNodeNumStatus(uint64_t status) const;
+  [[nodiscard]]  int getLeafNodeNumWithStatus(uint64_t status) const;
+
+  [[nodiscard]]   int getNodeNumWithType(int t) const;
+
+  [[nodiscard]]   int getLeafNodeNumWithWithType(int t) const;
 
   [[nodiscard]]  int getDepth() const;
   /**
@@ -192,6 +209,14 @@ static inline std::pair<Node *, bool> removeLeafNode(Node *node, checkFun_t fun,
 
 }
 
+std::vector<Node *> getAllNode(Node *root);
+
+std::vector<Node *> getAllNodeWithType(Node *root, int type);
+
+std::vector<Node *> getAllLeafNode(Node *root);
+
+std::vector<Node *> getAllLeafNodeType(Node *root, int type);
+
 class NodeManager {
 
  public:
@@ -217,7 +242,7 @@ class NodeManager {
 struct NodeIt {
   NodeIt() = default;
 
-  NodeIt(Node *n, int i) : node(n), ch_index(i) {
+  NodeIt(Node *n, size_t i) : node(n), ch_index(i) {
 
   }
 
@@ -233,7 +258,7 @@ struct NodeIt {
   }
 
   Node *node{nullptr};
-  int ch_index{0};
+  size_t ch_index{0};
 
 };
 
@@ -266,7 +291,7 @@ class NodeDFSIter {
 struct ConstDFSNodeIt {
   ConstDFSNodeIt() = default;
 
-  ConstDFSNodeIt(const Node *n, int i) : node(n), ch_index(i) {
+  ConstDFSNodeIt(const Node *n, size_t i) : node(n), ch_index(i) {
 
   }
 
@@ -279,7 +304,7 @@ struct ConstDFSNodeIt {
   }
 
   const Node *node{nullptr};
-  int ch_index{0};
+  size_t ch_index{0};
 };
 
 class ConstDFSNodeIter {
@@ -305,10 +330,6 @@ class ConstDFSNodeIter {
  private:
   std::vector<ConstDFSNodeIt> index_seq;
 };
-
-//Node *createNode();
-//
-//Node *createNode(void *v);
 
 }
 

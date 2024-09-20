@@ -5,13 +5,17 @@ project(CAS)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+
+include(cmake/compile_option.cmake)
+
 option(REQUIRE_GTEST "Require uses googletest UT framework" ON)
 if (REQUIRE_GTEST)
     enable_testing()
 endif ()
 
-set(HEADERS src/Node.h src/Shape.h src/DumpAble.h src/ValidAble.h src/Var.h src/Memory.h src/IDMixin.hpp src/TreeAlg.h)
-set(SRCS src/Node.cpp src/TreeAlg.cpp)
+set(HEADERS src/Node.h src/Shape.h src/DumpAble.h src/ValidAble.h src/Var.h src/Memory.h src/IDMixin.hpp src/TreeAlg.h src/TreeUpdater.h)
+set(SRCS src/Node.cpp src/TreeAlg.cpp src/TreeUpdater.cpp)
 
 add_library(cas ${SRCS} ${HEADERS})
 

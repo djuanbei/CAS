@@ -58,6 +58,8 @@ void priorityFirst(Node *node,
                    weight_fun_t w_fun, modify_fun_t
                    fun);
 
+
+
 }
 
 #endif //CAS_TREEALG_H

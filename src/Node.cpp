@@ -10,8 +10,8 @@ namespace cas {
 
 using namespace std;
 
-void Node::removeChild(int index) {
-  assert(index >= 0 && index < child_.size());
+void Node::removeChild(size_t index) {
+  assert(index < child_.size());
   auto ch = child_[index];
   child_.erase(child_.begin() + index);
   ch->parent_ = nullptr;
@@ -27,7 +27,7 @@ void Node::norm(compareFun_t fun) {
 int Node::getNodeNum() const {
   int num = 1;
   for (auto &d : child_) {
-    num += getNodeNum();
+    num += d->getNodeNum();
   }
   return num;
 
@@ -40,7 +40,7 @@ int Node::getLeafNodeNum() const {
 
   int num = 0;
   for (auto d : child_) {
-    num += getLeafNodeNum();
+    num += d->getLeafNodeNum();
   }
   return num;
 }
@@ -51,19 +51,43 @@ int Node::getNodeNumWithStatus(uint64_t status) const {
     num++;
   }
   for (auto d : child_) {
-    num += getNodeNumWithStatus(status);
+    num += d->getNodeNumWithStatus(status);
   }
   return num;
 
 }
 
-int Node::getLeafNodeNumStatus(uint64_t status) const {
+int Node::getLeafNodeNumWithStatus(uint64_t status) const {
   if (child_.empty()) {
     return getStatus() == status ? 1 : 0;
   }
   int num = 0;
   for (auto d : child_) {
-    num += getLeafNodeNumStatus(status);
+    num += d->getLeafNodeNumWithStatus(status);
+  }
+  return num;
+
+}
+
+int Node::getNodeNumWithType(int t) const {
+  int num = 0;
+  if (getType() == t) {
+    num++;
+  }
+  for (auto d : child_) {
+    num += d->getNodeNumWithType(t);
+  }
+  return num;
+
+}
+
+int Node::getLeafNodeNumWithWithType(int t) const {
+  if (child_.empty()) {
+    return getType() == t ? 1 : 0;
+  }
+  int num = 0;
+  for (auto d : child_) {
+    num += d->getLeafNodeNumWithWithType(t);
   }
   return num;
 

@@ -45,7 +45,7 @@ Node *generateTree(NodeManager &manager, int node_num, int degree, int depth) {
   assert(degree < 5);
   std::vector<int> node_value(node_num);
   for (size_t i = 0; i < node_value.size(); i++) {
-    node_value[i] = i;
+    node_value[i] = (int)i;
   }
   shuffle(node_value.begin(), node_value.end(), std::default_random_engine());
 
