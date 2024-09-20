@@ -93,6 +93,75 @@ int Node::getLeafNodeNumWithWithType(int t) const {
 
 }
 
+void Node::getAllNode(std::vector<Node *> &nodes) const {
+  for (auto d : child_) {
+    nodes.emplace_back(d);
+    d->getAllNode(nodes);
+  }
+
+}
+
+void Node::getAllNodeWithType(std::vector<Node *> &nodes, int t) const {
+
+  for (auto d : child_) {
+    if (d->getType() == t) {
+      nodes.emplace_back(d);
+    }
+    d->getAllNodeWithType(nodes, t);
+  }
+
+}
+
+void Node::getAllNodeWithStatus(std::vector<Node *> &nodes, uint64_t status) const {
+  for (auto d : child_) {
+    if (d->getStatus() == status) {
+      nodes.emplace_back(d);
+    }
+    d->getAllNodeWithStatus(nodes);
+  }
+
+}
+
+void Node::getAllLeafNode(std::vector<Node *> &nodes) const {
+  for (auto d : child_) {
+    if (d->isLeaf()) {
+      nodes.emplace_back(d);
+    } else {
+      d->getAllLeafNode(nodes);
+    }
+  }
+
+}
+
+void Node::getAllLeafNodeWithType(std::vector<Node *> &nodes, int type) const {
+  for (auto d : child_) {
+    if (d->isLeaf()) {
+      if (d->getType() == type) {
+        nodes.emplace_back(d);
+      }
+
+    } else {
+      d->getAllLeafNodeWithType(nodes, type);
+    }
+
+  }
+
+}
+
+void Node::getAllLeafNodeWithStatus(std::vector<Node *> &nodes, uint64_t status) const {
+  for (auto d : child_) {
+    if (d->isLeaf()) {
+      if (d->getStatus() == status) {
+        nodes.emplace_back(d);
+      }
+    } else {
+      d->getAllLeafNodeWithStatus(nodes, status);
+    }
+
+  }
+
+}
+
 int Node::getDepth() const {
 
   int level = 0;

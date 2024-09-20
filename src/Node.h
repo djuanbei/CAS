@@ -116,7 +116,20 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 
   [[nodiscard]]   int getLeafNodeNumWithWithType(int t) const;
 
+  void getAllNode(std::vector<Node *> &nodes) const;
+
+  void getAllNodeWithType(std::vector<Node *> &nodes, int t) const;
+
+  void getAllNodeWithStatus(std::vector<Node *> &nodes, uint64_t status) const;
+
+  void getAllLeafNode(std::vector<Node *> &nodes) const;
+
+  void getAllLeafNodeWithType(std::vector<Node *> &nodes, int type) const;
+
+  void getAllLeafNodeWithStatus(std::vector<Node *> &nodes, uint64_t status) const;
+
   [[nodiscard]]  int getDepth() const;
+
   /**
    * @return true iff there is node been removed
    */
@@ -209,13 +222,66 @@ static inline std::pair<Node *, bool> removeLeafNode(Node *node, checkFun_t fun,
 
 }
 
-std::vector<Node *> getAllNode(Node *root);
+static inline std::vector<Node *> getAllNode(Node *root) {
+  std::vector<Node *> nodes;
+  nodes.emplace_back(root);
+  root->getAllNode(nodes);
+  return nodes;
+}
 
-std::vector<Node *> getAllNodeWithType(Node *root, int type);
+static inline std::vector<Node *> getAllNodeWithType(Node *root, int type) {
+  std::vector<Node *> nodes;
+  if (root->getType() == type) {
+    nodes.emplace_back(root);
+  }
+  root->getAllNodeWithType(nodes, type);
+  return nodes;
+}
 
-std::vector<Node *> getAllLeafNode(Node *root);
+static inline std::vector<Node *> getAllNodeWithStatus(Node *root, uint64_t statue) {
+  std::vector<Node *> nodes;
+  if (root->getStatus() == statue) {
+    nodes.emplace_back(root);
+  }
+  root->getAllNodeWithStatus(nodes, statue);
+  return nodes;
 
-std::vector<Node *> getAllLeafNodeType(Node *root, int type);
+}
+
+static inline std::vector<Node *> getAllLeafNode(Node *root) {
+  std::vector<Node *> nodes;
+  if (root->isLeaf()) {
+    return {root};
+  }
+  root->getAllLeafNode(nodes);
+  return nodes;
+
+}
+
+static inline std::vector<Node *> getAllLeafNodeWithType(Node *root, int type) {
+  std::vector<Node *> nodes;
+  if (root->isLeaf()) {
+    if (root->getType() == type) {
+      return {root};
+    }
+    return {};
+  }
+
+  root->getAllLeafNodeWithType(nodes, type);
+  return nodes;
+}
+
+static inline std::vector<Node *> getAllLeafNodeWithStatus(Node *root, uint64_t statue) {
+  std::vector<Node *> nodes;
+  if (root->isLeaf()) {
+    if (root->getStatus() == statue) {
+      return {root};
+    }
+    return {};
+  }
+  root->getAllLeafNodeWithStatus(nodes, statue);
+  return nodes;
+}
 
 class NodeManager {
 
