@@ -505,19 +505,30 @@ public:
     index_seq.emplace_back(root, -2);
   }
 
+  template<typename CHECKER>
+  bool next(const CHECKER &checker) {
+    while (nextImpl()) {
+      if (checker(getCurrentNode())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void nextSlide();
 
   void downChild();
 
   void upParent();
 
-  bool next();
-
   [[nodiscard]] const Node *getCurrentNode() const {
     return index_seq.back().getCurrentNode();
   }
 
 private:
+
+  bool nextImpl();
+
   std::vector<ConstDFSNodeIt> index_seq;
 };
 

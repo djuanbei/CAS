@@ -369,7 +369,7 @@ void ConstDFSNodeIter::upParent() {
   index_seq.pop_back();
 }
 
-bool ConstDFSNodeIter::next() {
+bool ConstDFSNodeIter::nextImpl() {
   if (index_seq.empty()) {
     return false;
   }
