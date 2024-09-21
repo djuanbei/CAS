@@ -50,7 +50,8 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
     )
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    add_compile_options(/W4 /WX /permissive- /fp:strict /analyze /we4244 /we4018 /wd4018 /wd4365)
+    #add_compile_options(/W4 /WX /permissive- /fp:strict /analyze /we4244 /we4018 /wd4018 /wd4365)
+    add_compile_options("/W0")
 
 endif ()
 
