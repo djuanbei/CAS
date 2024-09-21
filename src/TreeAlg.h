@@ -29,6 +29,9 @@ Node *generateTree(NodeManager &node_manager, std::vector<RawNode<T>> nodes) {
   for (int i = 0; i < (int) nodes.size(); i++) {
     auto &n = nodes[i];
     assert(n.parent < i);
+    if (i > 0) {
+      assert(n.parent > 0);
+    }
     auto v = new T;
     *v = n.value;
     auto tmp = node_manager.createNode(v);
