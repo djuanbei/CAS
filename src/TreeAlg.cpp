@@ -27,8 +27,8 @@ Node *build(NodeManager &manager, const std::vector<int> &value, int &i, int lev
       re->addChild(build(manager, value, i, level, degree));
     }
   }
-  auto dump = [](std::ostream &out, int tab_indent, const void *v) -> std::ostream & {
-    return out << string(tab_indent, '\t') << ", value: " << (*((int *) v));
+  auto dump = [](std::ostream &out, int tab_indent, const void *v_arg) -> std::ostream & {
+    return out << string(tab_indent, '\t') << ", value: " << (*((int *) v_arg));
   };
   re->setValueDumpFun(dump);
 
