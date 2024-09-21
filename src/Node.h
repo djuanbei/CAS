@@ -29,7 +29,7 @@ typedef void  (*valueDesFun_t)(void *);
 typedef bool (*checkFun_t)(const Node *);
 
 class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
- public:
+public:
   Node(const Node &) = delete;
 
   Node(Node &&) = delete;
@@ -39,6 +39,11 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
   [[nodiscard]] const void *getValue() const {
     return value_;
   }
+  template<typename T>
+  [[nodiscard]] const T &getValue() const {
+    return *((T *) value_);
+  }
+
   void releaseValue(const std::function<void(void *)> &d_fun) {
     d_fun(value_);
     value_ = nullptr;
@@ -160,7 +165,7 @@ class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 
   [[nodiscard]] bool valid() const override;
 
- private:
+private:
   Node() = default;
 
   explicit Node(void *v) : value_(v) {
@@ -289,7 +294,7 @@ static inline std::vector<Node *> getAllLeafNodeWithStatus(Node *root, uint64_t 
 
 class NodeManager {
 
- public:
+public:
   NodeManager() = default;
   NodeManager(std::function<void(void *)> d_fun) : value_des_fun_(std::move(d_fun)) {
 
@@ -303,7 +308,7 @@ class NodeManager {
     value_des_fun_ = std::move(d_fun);
   }
 
- private:
+private:
   std::vector<Node *> node_vec_;
   std::function<void(void *)> value_des_fun_{nullptr};
 
@@ -335,7 +340,7 @@ struct NodeIt {
 ///DFS
 class NodeDFSIter {
 
- public:
+public:
   explicit NodeDFSIter(Node *root) {
     index_seq.emplace_back(root, -2);
   }
@@ -352,7 +357,7 @@ class NodeDFSIter {
 
   void upParent();
 
- private:
+private:
 
   std::vector<NodeIt> index_seq;
 
@@ -379,7 +384,7 @@ struct ConstDFSNodeIt {
 
 class ConstDFSNodeIter {
 
- public:
+public:
 
   explicit ConstDFSNodeIter(Node *root) {
     index_seq.emplace_back(root, -2);
@@ -397,7 +402,7 @@ class ConstDFSNodeIter {
     return index_seq.back().getCurrentNode();
   }
 
- private:
+private:
   std::vector<ConstDFSNodeIt> index_seq;
 };
 
