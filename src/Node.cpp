@@ -5,6 +5,7 @@
 #include "Node.h"
 #include <cassert>
 #include <string>
+#include <algorithm>
 
 namespace cas {
 

@@ -4,6 +4,7 @@
 
 #include "TreeUpdater.h"
 //
+#include <algorithm>
 #include <cassert>
 #include <unordered_map>
 
