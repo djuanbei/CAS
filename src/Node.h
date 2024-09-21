@@ -111,6 +111,12 @@ public:
   void setStatus(uint64_t s) {
     status_ = s;
   }
+  void setTreeStatus(uint64_t s) {
+    status_ = s;
+    for (auto d : child_) {
+      d->setTreeStatus(s);
+    }
+  }
 
   void addChild(Node *node) {
     node->parent_ = this;
@@ -203,12 +209,80 @@ public:
   /**
    *  remove node when fun(n) hold
    */
-  bool removeNode(checkFun_t fun);
+  template<class Pred>
+  bool removeNode(const Pred &fun) {
+    auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+      if (fun(d)) {
+        d->parent_ = nullptr;
+        return true;
+      }
+      return false;
+    });
+    bool re = false;
+    if (it != child_.end()) {
+      re = true;
+      child_.resize(it-child_.begin());
+    }
+    for (auto d : child_) {
+      if (d->removeNode(fun)) {
+        re = true;
+      }
+    }
+    return re;
+
+  }
+  template<class U>
+  bool updateNode(const U &fun) {
+    bool re = false;
+    for (auto d : child_) {
+      if (d->updateNode(fun)) {
+        re = true;
+      }
+    }
+    if (fun(this)) {
+      re = true;
+    }
+    return re;
+  }
   /**
    * remove leaf node when fun(n) hold
    */
+  template<class Pred>
+  bool removeLeafNode(const Pred &fun, bool recursive = true) {
+    auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+      if (d->isLeaf() && fun(d)) {
+        d->parent_ = nullptr;
+        return true;
+      }
+      return false;
+    });
 
-  bool removeLeafNode(checkFun_t fun, bool recursive = true);
+    bool direct_re = false;
+    if (it != child_.end()) {
+      direct_re = true;
+    }
+
+    child_.resize(it - child_.begin());
+    bool ch_re = false;
+    for (auto d : child_) {
+      if (d->removeLeafNode(fun, recursive)) {
+        ch_re = true;
+      }
+    }
+
+    if (ch_re) {
+      it = remove_if(child_.begin(), child_.end(), [=](auto d) {
+        if (d->isLeaf() && fun(d)) {
+          d->parent_ = nullptr;
+          return true;
+        }
+        return false;
+      });
+      child_.resize(it - child_.begin());
+    }
+
+    return direct_re || ch_re;
+  }
 
   friend class NodeManager;
 
@@ -383,6 +457,19 @@ struct NodeIt {
   bool withNextSlide() const {
     return ch_index + 1 < node->getChildNum();
   }
+  template<class Pred>
+  void removeVistNode(const Pred &pred) {
+    for (int i = 0; i < ch_index; i++) {
+      node->getChild(i)->removeNode(pred);
+    }
+
+  }
+  template<class U>
+  void updateVisitNode(const U &fun) {
+    for (int i = 0; i < ch_index; i++) {
+      node->getChild(i)->updateNode(fun);
+    }
+  }
 
   Node *node{nullptr};
   int ch_index{0};
@@ -419,11 +506,39 @@ public:
     });
   }
 
-  void nextSlide();
+  template<class U>
+  void updateVisitNode(const U &fun) {
+    for (auto &e : index_seq) {
+      e.updateVisitNode(fun);
+    }
+  }
 
-  void downChild();
+  /**
+   *  remove the visit node which pred hold
+   */
+  template<class Pred>
+  void removeVisitNode(const Pred &pred) {
+    for (auto &e : index_seq) {
+      e.removeVistNode(pred);
+    }
+  }
 
-  void upParent();
+  void nextSlide() {
+    index_seq.back().ch_index++;
+    assert(index_seq.back().ch_index < index_seq.back().node->getChildNum());
+  }
+
+  void downChild() {
+    auto current = getCurrentNode();
+    assert(current);
+    assert(current->getChildNum() > 0);
+    index_seq.emplace_back(current, 0);
+  }
+
+  void upParent() {
+    assert(!index_seq.empty());
+    index_seq.pop_back();
+  }
 
   Node *getCurrentNode() {
     return index_seq.back().getCurrentNode();
@@ -437,6 +552,7 @@ protected:
 private:
   template<typename APPEND_CHILD>
   bool nextImpl(const APPEND_CHILD &appender) {
+
     if (index_seq.empty()) {
       return false;
     }

@@ -188,6 +188,7 @@ bool Node::removeNodeWithStatus(uint64_t status) {
   });
   bool re = false;
   if (it != child_.end()) {
+    child_.resize(it - child_.begin());
     re = true;
   }
   child_.resize(it - child_.begin());
@@ -212,6 +213,7 @@ bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
 
   bool direct_re = false;
   if (it != child_.end()) {
+    child_.resize(it-child_.begin());
     direct_re = true;
   }
 
@@ -226,70 +228,6 @@ bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
   if (ch_re) {
     it = remove_if(child_.begin(), child_.end(), [=](auto d) {
       if (d->isLeaf() && d->getStatus() == status) {
-        d->parent_ = nullptr;
-        return true;
-      }
-      return false;
-    });
-    child_.resize(it - child_.begin());
-  }
-
-  return direct_re || ch_re;
-
-}
-
-/**
- *  remove node when fun(n) hold
- */
-bool Node::removeNode(checkFun_t fun) {
-  auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
-    if (fun(d)) {
-      d->parent_ = nullptr;
-      return true;
-    }
-    return false;
-  });
-  bool re = false;
-  if (it != child_.end()) {
-    re = true;
-  }
-  for (auto d : child_) {
-    if (d->removeNode(fun)) {
-      re = true;
-    }
-  }
-  return re;
-}
-/**
- * remove leaf node when fun(n) hold
- */
-
-bool Node::removeLeafNode(checkFun_t fun, bool recursive) {
-
-  auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
-    if (d->isLeaf() && fun(d)) {
-      d->parent_ = nullptr;
-      return true;
-    }
-    return false;
-  });
-
-  bool direct_re = false;
-  if (it != child_.end()) {
-    direct_re = true;
-  }
-
-  child_.resize(it - child_.begin());
-  bool ch_re = false;
-  for (auto d : child_) {
-    if (d->removeLeafNode(fun, recursive)) {
-      ch_re = true;
-    }
-  }
-
-  if (ch_re) {
-    it = remove_if(child_.begin(), child_.end(), [=](auto d) {
-      if (d->isLeaf() && fun(d)) {
         d->parent_ = nullptr;
         return true;
       }
@@ -333,23 +271,6 @@ std::ostream &Node::dump(std::ostream &out, int tab_indent) const {
   }
   return out;
 
-}
-
-void NodeDFSIter::nextSlide() {
-  index_seq.back().ch_index++;
-  assert(index_seq.back().ch_index < index_seq.back().node->getChildNum());
-}
-
-void NodeDFSIter::downChild() {
-  auto current = getCurrentNode();
-  assert(current);
-  assert(current->getChildNum() > 0);
-  index_seq.emplace_back(current, 0);
-}
-
-void NodeDFSIter::upParent() {
-  assert(!index_seq.empty());
-  index_seq.pop_back();
 }
 
 void ConstDFSNodeIter::nextSlide() {

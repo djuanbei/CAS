@@ -89,6 +89,52 @@ TEST(EnumBitDFSIter, simple) {
   ASSERT_EQ(node_num, 14);
 }
 
+TEST(EnumBitDFSIter, simple1) {
+
+  EnumBitDFSIter enum_dfs_iter(10);
+
+  auto value_merge_fun = [](const std::vector<const void *> &v_s) {
+    std::vector<int> re;
+    for (auto n : v_s) {
+      auto vv_s = (const std::vector<int> *) n;
+      re.insert(re.end(), vv_s->begin(), vv_s->end());
+    }
+    return re;
+  };
+
+  NodeDFSIter nodeDfsIter(enum_dfs_iter.getRoot(), enum_dfs_iter.rootIsFake());
+
+  auto checker = [&](const Node *node) {
+    auto vs = node->getValueTail<int>(value_merge_fun);
+    return vs.size() < 4 || (vs.back() > 0 && vs[vs.size() - 2] > 0);
+  };
+  int num = 0;
+  while (nodeDfsIter.next(checker, enum_dfs_iter.appendChildFun())) {
+    num++;
+    if (num == 200) {
+      nodeDfsIter.updateVisitNode([](Node *n) {
+        n->setStatus(1);
+        return true;
+      });
+
+      nodeDfsIter.removeVisitNode([](const Node *n) {
+        return n->getStatus() == 1;
+      });
+    }
+
+    auto current = nodeDfsIter.getCurrentNode();
+    auto vs = current->getValueTail<int>(value_merge_fun);
+    for (size_t i = 1; i < vs.size(); i++) {
+      cout << " " << vs[i];
+    }
+    cout << endl;
+  }
+
+  enum_dfs_iter.getRoot()->dump(std::cout, 0);
+
+}
+
+
 
 
 
