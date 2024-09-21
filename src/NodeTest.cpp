@@ -73,10 +73,13 @@ TEST(EnumBitDFSIter, simple) {
     }
     return re;
   };
+
+  NodeDFSIter nodeDfsIter(enum_dfs_iter.getRoot(), enum_dfs_iter.rootIsFake());
+
   int node_num = 0;
-  while (enum_dfs_iter.next()) {
+  while (nodeDfsIter.next(enum_dfs_iter.getChecker(), enum_dfs_iter.appendChildFun())) {
     node_num++;
-    auto current = enum_dfs_iter.getCurrentNode();
+    auto current = nodeDfsIter.getCurrentNode();
     auto vs = current->getValueTail<int>(value_merge_fun);
     for (size_t i = 1; i < vs.size(); i++) {
       cout << " " << vs[i];

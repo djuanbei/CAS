@@ -393,11 +393,31 @@ struct NodeIt {
 class NodeDFSIter {
 
 public:
-  explicit NodeDFSIter(Node *root) {
-    index_seq.emplace_back(root, -2);
+  ///root_is_dummy is true then root is real node (fake node)
+  explicit NodeDFSIter(Node *root, bool root_is_dummy = false) {
+    if (root_is_dummy) {
+      index_seq.emplace_back(root, -1);
+    } else {
+      index_seq.emplace_back(root, -2);
+    }
   }
 
-  bool next();
+  template<typename CHECKER, typename APPEND_CHILD>
+  bool next(const CHECKER &checker, const APPEND_CHILD &appender) {
+    while (nextImpl(appender)) {
+      if (checker(getCurrentNode())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool next() {
+    return next([](const Node *) {
+      return true;
+    }, [](Node *) {
+    });
+  }
 
   void nextSlide();
 
@@ -415,6 +435,43 @@ protected:
   }
 
 private:
+  template<typename APPEND_CHILD>
+  bool nextImpl(const APPEND_CHILD &appender) {
+    if (index_seq.empty()) {
+      return false;
+    }
+    auto current = getCurrentNode();
+
+    assert(valid(current));
+    appender(current);
+
+    if (index_seq.size() == 1 && index_seq[0].ch_index == -2) {
+      index_seq[0].ch_index = -1;
+      return true;
+    }
+
+    if (index_seq.size() == 1 && index_seq[0].ch_index == -1) {
+      if (current->getChildNum() > 0) {
+        index_seq[0].ch_index = 0;
+        return true;
+      }
+      return false;
+    }
+
+    if (current->getChildNum() > 0) {
+      downChild();
+      return true;
+    }
+    while (!index_seq.empty()) {
+      if (index_seq.back().withNextSlide()) {
+        nextSlide();
+        return true;
+      }
+      upParent();
+    }
+    return false;
+
+  }
 
   std::vector<NodeIt> index_seq;
 

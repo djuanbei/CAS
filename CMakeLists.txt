@@ -18,6 +18,7 @@ endif ()
 set(HEADERS src/Node.h src/Shape.h src/DumpAble.h src/ValidAble.h src/Var.h src/Memory.h
         src/IDMixin.hpp src/TreeAlg.h src/TreeUpdater.h
         src/tree/EnumBitDFSIter.h
+        src/tree/DFSIterInterface.h
 )
 set(SRCS src/Node.cpp src/TreeAlg.cpp src/TreeUpdater.cpp src/tree/EnumBitDFSIter.cpp)
 
