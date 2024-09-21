@@ -9,7 +9,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(cmake/compile_option.cmake)
 
-option(REQUIRE_GTEST "Require uses googletest UT framework" ON)
+option(REQUIRE_GTEST "Require uses googletest UT framework" OFF)
 if (REQUIRE_GTEST)
     enable_testing()
 endif ()
