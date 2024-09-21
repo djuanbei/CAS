@@ -15,8 +15,11 @@ if (REQUIRE_GTEST)
     enable_testing()
 endif ()
 
-set(HEADERS src/Node.h src/Shape.h src/DumpAble.h src/ValidAble.h src/Var.h src/Memory.h src/IDMixin.hpp src/TreeAlg.h src/TreeUpdater.h)
-set(SRCS src/Node.cpp src/TreeAlg.cpp src/TreeUpdater.cpp)
+set(HEADERS src/Node.h src/Shape.h src/DumpAble.h src/ValidAble.h src/Var.h src/Memory.h
+        src/IDMixin.hpp src/TreeAlg.h src/TreeUpdater.h
+        src/tree/EnumBitDFSIter.h
+)
+set(SRCS src/Node.cpp src/TreeAlg.cpp src/TreeUpdater.cpp src/tree/EnumBitDFSIter.cpp)
 
 add_library(cas ${SRCS} ${HEADERS})
 

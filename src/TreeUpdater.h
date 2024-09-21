@@ -14,7 +14,7 @@ namespace cas {
 
 class NodeUpdater {
 
- public:
+public:
   virtual ~NodeUpdater() = default;
 
   bool handle(Node *node) const {
@@ -31,7 +31,7 @@ class NodeUpdater {
   virtual bool listenAllKind() const = 0;
   virtual std::vector<int> getListenType() const = 0;
 
- protected:
+protected:
   virtual bool isFit(const Node *n) const = 0;
   virtual void update(Node *node) const = 0;
 

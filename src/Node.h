@@ -13,6 +13,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <algorithm>
 #include <cassert>
 
 namespace cas {
@@ -30,6 +31,7 @@ typedef bool (*checkFun_t)(const Node *);
 
 class Node : public IDMiXin<Node>, public DumpAble, public ValidAble {
 public:
+
   Node(const Node &) = delete;
 
   Node(Node &&) = delete;
@@ -42,6 +44,55 @@ public:
   template<typename T>
   [[nodiscard]] const T &getValue() const {
     return *((T *) value_);
+  }
+
+  /// this -> parent -> parent -> ... -> root
+
+  std::vector<const void *> getValueBackTail() const {
+    std::vector<const void *> tail;
+    auto current = this;
+    while (current) {
+      tail.emplace_back(current->getValue());
+      current = current->getParent();
+    }
+    return tail;
+  }
+
+  /// root-> ... parent-> this
+  std::vector<const void *> getValueTail() const {
+    auto re = getValueBackTail();
+    std::reverse(re.begin(), re.end());
+    return re;
+  }
+
+  template<typename T>
+  std::vector<T> getValueBackTail(const std::function<std::vector<T>(const std::vector<const void *> &vs)> &fun) const {
+    return fun(getValueBackTail());
+  }
+
+  template<typename T>
+  std::vector<T> getValueTail(const std::function<std::vector<T>(const std::vector<const void *> &vs)> &fun) const {
+    return fun(getValueTail());
+  }
+
+  /// this -> parent -> parent -> ... -> root
+
+  template<typename T>
+  std::vector<T> getValueBackTail() const {
+    std::vector<T> tail;
+    auto current = this;
+    while (current) {
+      tail.emplace_back(current->getValue<T>());
+      current = current->getParent();
+    }
+    return tail;
+  }
+  /// root-> ... parent-> this
+  template<typename T>
+  std::vector<T> getValueTail() const {
+    auto re = getValueBackTail<T>();
+    std::reverse(re.begin(), re.end());
+    return re;
   }
 
   void releaseValue(const std::function<void(void *)> &d_fun) {
@@ -300,7 +351,7 @@ public:
 
   }
   ~NodeManager();
-  Node *createNode();
+  //Node *createNode();
 
   Node *createNode(void *v);
 
@@ -314,6 +365,7 @@ private:
 
 };
 
+///DFS
 struct NodeIt {
   NodeIt() = default;
 
@@ -347,21 +399,27 @@ public:
 
   bool next();
 
-  Node *getCurrentNode() {
-    return index_seq.back().getCurrentNode();
-  }
-
   void nextSlide();
 
   void downChild();
 
   void upParent();
 
+  Node *getCurrentNode() {
+    return index_seq.back().getCurrentNode();
+  }
+
+protected:
+  bool valid(class Node *n) const {
+    return (n != nullptr) && (n->getValue() != nullptr);
+  }
+
 private:
 
   std::vector<NodeIt> index_seq;
 
 };
+///DFS
 
 struct ConstDFSNodeIt {
   ConstDFSNodeIt() = default;

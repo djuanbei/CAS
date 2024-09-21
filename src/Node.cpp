@@ -350,7 +350,6 @@ void NodeDFSIter::downChild() {
 void NodeDFSIter::upParent() {
   assert(!index_seq.empty());
   index_seq.pop_back();
-
 }
 
 bool NodeDFSIter::next() {
@@ -359,8 +358,8 @@ bool NodeDFSIter::next() {
   }
 
   auto current = getCurrentNode();
+  assert(valid(current));
 
-  assert(current);
   if (index_seq.size() == 1 && index_seq[0].ch_index == -2) {
     index_seq[0].ch_index = -1;
     return true;
@@ -455,11 +454,11 @@ NodeManager::~NodeManager() {
   node_vec_.clear();
 
 }
-Node *NodeManager::createNode() {
-  auto re = new Node();
-  node_vec_.emplace_back(re);
-  return re;
-}
+//Node *NodeManager::createNode() {
+//  auto re = new Node();
+//  node_vec_.emplace_back(re);
+//  return re;
+//}
 
 Node *NodeManager::createNode(void *v) {
   auto re = new Node(v);
