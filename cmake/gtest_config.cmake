@@ -19,10 +19,26 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang
     target_compile_options(gtest_main PRIVATE -w)
 
 else ()
-    target_compile_options(gmock PRIVATE /wd4100)
-    target_compile_options(gmock_main PRIVATE /wd4100)
-    target_compile_options(gtest PRIVATE /wd4100)
-    target_compile_options(gtest_main PRIVATE /wd4100)
+    target_compile_options(gmock PRIVATE "/wd4005"
+            "/wd4101"
+            "/wd4244"
+            "/wd4305"
+            "/wd4996")
+    target_compile_options(gmock_main PRIVATE "/wd4005"
+            "/wd4101"
+            "/wd4244"
+            "/wd4305"
+            "/wd4996")
+    target_compile_options(gtest PRIVATE "/wd4005"
+            "/wd4101"
+            "/wd4244"
+            "/wd4305"
+            "/wd4996")
+    target_compile_options(gtest_main PRIVATE "/wd4005"
+            "/wd4101"
+            "/wd4244"
+            "/wd4305"
+            "/wd4996")
 
 endif ()
 
