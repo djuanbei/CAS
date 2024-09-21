@@ -53,7 +53,7 @@ TEST(Node, DFS_simple1) {
   ASSERT_EQ(visit_value_vec[0], 10);
   ASSERT_EQ(visit_value_vec[1], 30);
   ASSERT_EQ(visit_value_vec[2], 100);
-  ASSERT_EQ(visit_value_vec[3], 20);
+  ASSERT_EQ(visit_value_vec[3], 201);
 
 }
 
