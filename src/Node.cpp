@@ -213,7 +213,7 @@ bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
 
   bool direct_re = false;
   if (it != child_.end()) {
-    child_.resize(it-child_.begin());
+    child_.resize(it - child_.begin());
     direct_re = true;
   }
 
@@ -271,23 +271,6 @@ std::ostream &Node::dump(std::ostream &out, int tab_indent) const {
   }
   return out;
 
-}
-
-void ConstDFSNodeIter::nextSlide() {
-  index_seq.back().ch_index++;
-  assert(index_seq.back().ch_index < index_seq.back().node->getChildNum());
-}
-
-void ConstDFSNodeIter::downChild() {
-  auto current = getCurrentNode();
-  assert(current);
-  assert(current->getChildNum() > 0);
-  index_seq.emplace_back(current, 0);
-}
-
-void ConstDFSNodeIter::upParent() {
-  assert(!index_seq.empty());
-  index_seq.pop_back();
 }
 
 bool ConstDFSNodeIter::nextImpl() {

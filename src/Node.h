@@ -221,7 +221,7 @@ public:
     bool re = false;
     if (it != child_.end()) {
       re = true;
-      child_.resize(it-child_.begin());
+      child_.resize(it - child_.begin());
     }
     for (auto d : child_) {
       if (d->removeNode(fun)) {
@@ -523,6 +523,17 @@ public:
     }
   }
 
+  Node *getCurrentNode() {
+    return index_seq.back().getCurrentNode();
+  }
+
+protected:
+  bool valid(class Node *n) const {
+    return (n != nullptr) && (n->getValue() != nullptr);
+  }
+
+private:
+
   void nextSlide() {
     index_seq.back().ch_index++;
     assert(index_seq.back().ch_index < index_seq.back().node->getChildNum());
@@ -540,16 +551,6 @@ public:
     index_seq.pop_back();
   }
 
-  Node *getCurrentNode() {
-    return index_seq.back().getCurrentNode();
-  }
-
-protected:
-  bool valid(class Node *n) const {
-    return (n != nullptr) && (n->getValue() != nullptr);
-  }
-
-private:
   template<typename APPEND_CHILD>
   bool nextImpl(const APPEND_CHILD &appender) {
 
@@ -631,17 +632,28 @@ public:
     return false;
   }
 
-  void nextSlide();
-
-  void downChild();
-
-  void upParent();
-
   [[nodiscard]] const Node *getCurrentNode() const {
     return index_seq.back().getCurrentNode();
   }
 
 private:
+
+  void nextSlide() {
+    index_seq.back().ch_index++;
+    assert(index_seq.back().ch_index < index_seq.back().node->getChildNum());
+  }
+
+  void downChild() {
+    auto current = getCurrentNode();
+    assert(current);
+    assert(current->getChildNum() > 0);
+    index_seq.emplace_back(current, 0);
+  }
+
+  void upParent() {
+    assert(!index_seq.empty());
+    index_seq.pop_back();
+  }
 
   bool nextImpl();
 
