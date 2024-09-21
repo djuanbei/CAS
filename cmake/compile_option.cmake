@@ -24,6 +24,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
             #-Wno-unused
             -Wno-sign-compare
             -Wno-sign-conversion
+            -Wno-undef
 
     )
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -45,6 +46,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             #-Wno-unused
             -Wno-sign-compare
             -Wno-sign-conversion
+            -Wno-undef
 
     )
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
