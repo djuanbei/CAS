@@ -1,7 +1,6 @@
 
-#find_library(GTEST_LIBRARY NAMES gtest gtest_main)
-##
-#if (NOT GTEST_LIBRARY)
+cmake_policy(SET CMP0135 NEW)         # Use the new behavior globally
+
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -10,6 +9,25 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+
+    target_compile_options(gmock PRIVATE -w)
+    target_compile_options(gmock_main PRIVATE -w)
+    target_compile_options(gtest PRIVATE -w)
+    target_compile_options(gtest_main PRIVATE -w)
+
+else ()
+    target_compile_options(gmock PRIVATE /wd4100)
+    target_compile_options(gmock_main PRIVATE /wd4100)
+    target_compile_options(gtest PRIVATE /wd4100)
+    target_compile_options(gtest_main PRIVATE /wd4100)
+
+endif ()
+
+
 enable_testing()
 include(GoogleTest)
-#endif ()
+
+
