@@ -30,7 +30,7 @@ Node *generateTree(NodeManager &node_manager, std::vector<RawNode<T>> nodes) {
     auto &n = nodes[i];
     assert(n.parent < i);
     if (i > 0) {
-      assert(n.parent > 0);
+      assert(n.parent >= 0);
     }
     auto v = new T;
     *v = n.value;

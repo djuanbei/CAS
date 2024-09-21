@@ -11,6 +11,7 @@ include(cmake/compile_option.cmake)
 
 option(REQUIRE_GTEST "Require uses googletest UT framework" OFF)
 if (REQUIRE_GTEST)
+    include(cmake/gtest_config.cmake)
     enable_testing()
 endif ()
 
@@ -28,8 +29,11 @@ target_link_libraries(cas_app PRIVATE cas)
 if (REQUIRE_GTEST)
     set(UT_SRCS src/NodeTest.cpp)
     add_executable(CASTest ${UT_SRCS})
-    target_include_directories(CASTest PRIVATE /opt/homebrew/opt/googletest/include)
-    target_link_directories(CASTest PRIVATE /opt/homebrew/opt/googletest/lib)
-    target_link_libraries(CASTest PRIVATE cas gtest gtest_main ${Boost_LIBRARIES})
+    if (GTEST_LIBRARY)
+        target_include_directories(CASTest PRIVATE /opt/homebrew/opt/googletest/include)
+        target_link_directories(CASTest PRIVATE /opt/homebrew/opt/googletest/lib)
+        target_link_libraries(CASTest PRIVATE cas gtest gtest_main)
+    endif ()
+
 endif ()
 
