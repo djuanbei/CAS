@@ -118,7 +118,6 @@ void dfs(Node *node,
       wait_S.emplace_back(e.first->getChild(e.second), -1);
     }
   }
-
 }
 
 void dfs(const Node *node, nodeCheck_t is_ok, handle_fun_t fun) {

@@ -589,11 +589,12 @@ private:
     return false;
 
   }
-
   std::vector<NodeIt> index_seq;
 
 };
 ///DFS
+
+
 
 struct ConstDFSNodeIt {
   ConstDFSNodeIt() = default;
