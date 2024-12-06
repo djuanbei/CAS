@@ -9,34 +9,24 @@
 
 namespace cas {
 
+template <typename D> class IDMiXin {
+public:
+  IDMiXin() {
+    static_assert(std::is_base_of<IDMiXin<D>, D>::value);
+    id_ = nextId();
+  }
 
-    template<typename D>
-    class IDMiXin {
-    public:
+  [[nodiscard]] int getId() const { return id_; }
 
-        IDMiXin() {
-            static_assert(std::is_base_of<IDMiXin<D>, D>::value);
-            id_ = nextId();
-        }
+private:
+  int id_{0};
 
-        [[nodiscard]] int getId() const {
-            return id_;
-        }
+  static int nextId() {
+    static int global_id = 0;
+    return global_id++;
+  }
+};
 
+} // namespace cas
 
-    private:
-        int id_{0};
-
-        static int nextId() {
-            static int global_id = 0;
-            return global_id++;
-        }
-
-
-    };
-
-
-}
-
-
-#endif //CAS_IDMIXIN_H
+#endif // CAS_IDMIXIN_H

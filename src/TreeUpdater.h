@@ -4,9 +4,10 @@
 
 #ifndef CAS_SRC_UPDATER_H_
 #define CAS_SRC_UPDATER_H_
-#include "Node.h"
-#include <vector>
 #include <memory>
+#include <vector>
+//
+#include "Node.h"
 namespace cas {
 /**
  * Update node by the member of node of member of direct child
@@ -24,9 +25,7 @@ public:
     }
     return false;
   }
-  [[nodiscard]] int getPriority() const {
-    return priority;
-  }
+  [[nodiscard]] int getPriority() const { return priority; }
 
   virtual bool listenAllKind() const = 0;
   virtual std::vector<int> getListenType() const = 0;
@@ -35,19 +34,19 @@ protected:
   virtual bool isFit(const Node *n) const = 0;
   virtual void update(Node *node) const = 0;
 
-  ///large first
+  /// large first
   int priority{0};
-
 };
 
 inline static bool operator<(const std::shared_ptr<const NodeUpdater> &lhs,
                              const std::shared_ptr<const NodeUpdater> &rhs) {
   return lhs->getPriority() > rhs->getPriority();
-
 }
 
-void update(Node *root, const std::vector<std::shared_ptr<const NodeUpdater>> &updater_list);
+void update(
+    Node *root,
+    const std::vector<std::shared_ptr<const NodeUpdater>> &updater_list);
 
-}
+} // namespace cas
 
-#endif //CAS_SRC_UPDATER_H_
+#endif // CAS_SRC_UPDATER_H_

@@ -8,9 +8,7 @@
 #include "IDMixin.hpp"
 
 namespace cas {
-    class Var : public IDMiXin<Var> {
+class Var : public IDMiXin<Var> {};
+} // namespace cas
 
-    };
-}
-
-#endif //CAS_VAR_H
+#endif // CAS_VAR_H

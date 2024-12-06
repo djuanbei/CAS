@@ -3,9 +3,10 @@
 //
 
 #include "Node.h"
+//
+#include <algorithm>
 #include <cassert>
 #include <string>
-#include <algorithm>
 
 namespace cas {
 
@@ -31,7 +32,6 @@ int Node::getNodeNum() const {
     num += d->getNodeNum();
   }
   return num;
-
 }
 
 int Node::getLeafNodeNum() const {
@@ -55,7 +55,6 @@ int Node::getNodeNumWithStatus(uint64_t status) const {
     num += d->getNodeNumWithStatus(status);
   }
   return num;
-
 }
 
 int Node::getLeafNodeNumWithStatus(uint64_t status) const {
@@ -67,7 +66,6 @@ int Node::getLeafNodeNumWithStatus(uint64_t status) const {
     num += d->getLeafNodeNumWithStatus(status);
   }
   return num;
-
 }
 
 int Node::getNodeNumWithType(int t) const {
@@ -79,7 +77,6 @@ int Node::getNodeNumWithType(int t) const {
     num += d->getNodeNumWithType(t);
   }
   return num;
-
 }
 
 int Node::getLeafNodeNumWithWithType(int t) const {
@@ -91,7 +88,6 @@ int Node::getLeafNodeNumWithWithType(int t) const {
     num += d->getLeafNodeNumWithWithType(t);
   }
   return num;
-
 }
 
 void Node::getAllNode(std::vector<Node *> &nodes) const {
@@ -99,7 +95,6 @@ void Node::getAllNode(std::vector<Node *> &nodes) const {
     nodes.emplace_back(d);
     d->getAllNode(nodes);
   }
-
 }
 
 void Node::getAllNodeWithType(std::vector<Node *> &nodes, int t) const {
@@ -110,17 +105,16 @@ void Node::getAllNodeWithType(std::vector<Node *> &nodes, int t) const {
     }
     d->getAllNodeWithType(nodes, t);
   }
-
 }
 
-void Node::getAllNodeWithStatus(std::vector<Node *> &nodes, uint64_t status) const {
+void Node::getAllNodeWithStatus(std::vector<Node *> &nodes,
+                                uint64_t status) const {
   for (auto d : child_) {
     if (d->getStatus() == status) {
       nodes.emplace_back(d);
     }
     d->getAllNodeWithStatus(nodes, status);
   }
-
 }
 
 void Node::getAllLeafNode(std::vector<Node *> &nodes) const {
@@ -131,7 +125,6 @@ void Node::getAllLeafNode(std::vector<Node *> &nodes) const {
       d->getAllLeafNode(nodes);
     }
   }
-
 }
 
 void Node::getAllLeafNodeWithType(std::vector<Node *> &nodes, int type) const {
@@ -144,12 +137,11 @@ void Node::getAllLeafNodeWithType(std::vector<Node *> &nodes, int type) const {
     } else {
       d->getAllLeafNodeWithType(nodes, type);
     }
-
   }
-
 }
 
-void Node::getAllLeafNodeWithStatus(std::vector<Node *> &nodes, uint64_t status) const {
+void Node::getAllLeafNodeWithStatus(std::vector<Node *> &nodes,
+                                    uint64_t status) const {
   for (auto d : child_) {
     if (d->isLeaf()) {
       if (d->getStatus() == status) {
@@ -158,9 +150,7 @@ void Node::getAllLeafNodeWithStatus(std::vector<Node *> &nodes, uint64_t status)
     } else {
       d->getAllLeafNodeWithStatus(nodes, status);
     }
-
   }
-
 }
 
 int Node::getDepth() const {
@@ -175,8 +165,8 @@ int Node::getDepth() const {
 }
 
 /**
-  * @return true iff there is node been removed
-  */
+ * @return true iff there is node been removed
+ */
 
 bool Node::removeNodeWithStatus(uint64_t status) {
   auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
@@ -200,8 +190,8 @@ bool Node::removeNodeWithStatus(uint64_t status) {
   return re;
 }
 /**
-   * @return true iff there is node been removed
-   */
+ * @return true iff there is node been removed
+ */
 bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
   auto it = remove_if(child_.begin(), child_.end(), [=](auto d) {
     if (d->isLeaf() && d->getStatus() == status) {
@@ -237,7 +227,6 @@ bool Node::removeLeafNodeWithStatus(uint64_t status, bool recursive) {
   }
 
   return direct_re || ch_re;
-
 }
 
 bool Node::valid() const {
@@ -253,14 +242,14 @@ bool Node::valid() const {
     }
   }
 
-  return std::all_of(child_.begin(), child_.end(), [](auto &d) {
-    return d->valid();
-  });
+  return std::all_of(child_.begin(), child_.end(),
+                     [](auto &d) { return d->valid(); });
 }
 
 std::ostream &Node::dump(std::ostream &out, int tab_indent) const {
   out << string(tab_indent, '\t');
-  out << "ID: " << getId() << ", " << "type: " << type_ << ", " << ", status: " << status_;
+  out << "ID: " << getId() << ", " << "type: " << type_ << ", "
+      << ", status: " << status_;
 
   if (value_dump_fun) {
     value_dump_fun(out, 1, value_);
@@ -270,7 +259,6 @@ std::ostream &Node::dump(std::ostream &out, int tab_indent) const {
     d->dump(out, tab_indent + 1);
   }
   return out;
-
 }
 
 bool ConstDFSNodeIter::nextImpl() {
@@ -306,7 +294,6 @@ bool ConstDFSNodeIter::nextImpl() {
     upParent();
   }
   return false;
-
 }
 
 NodeManager::~NodeManager() {
@@ -319,7 +306,6 @@ NodeManager::~NodeManager() {
     delete n;
   }
   node_vec_.clear();
-
 }
 
 Node *NodeManager::createNode(void *v) {
@@ -328,4 +314,4 @@ Node *NodeManager::createNode(void *v) {
   return re;
 }
 
-}
+} // namespace cas

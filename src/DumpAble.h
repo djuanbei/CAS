@@ -9,13 +9,13 @@
 
 namespace cas {
 
-    class DumpAble {
-    public:
-        virtual ~DumpAble() = default;
+class DumpAble {
+public:
+  virtual ~DumpAble() = default;
 
-        virtual std::ostream &dump(std::ostream &out, int tab_indent) const = 0;
-    };
+  virtual std::ostream &dump(std::ostream &out, int tab_indent) const = 0;
+};
 
-}
+} // namespace cas
 
-#endif //CAS_DUMPABLE_H
+#endif // CAS_DUMPABLE_H

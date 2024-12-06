@@ -10,10 +10,13 @@
 
 namespace cas {
 using namespace std;
-void update(Node *root, const std::vector<std::shared_ptr<const NodeUpdater>> &updater_list) {
+void update(
+    Node *root,
+    const std::vector<std::shared_ptr<const NodeUpdater>> &updater_list) {
   assert(root);
-  std::vector<shared_ptr<const NodeUpdater> > universal_listener;
-  unordered_map<int, std::vector<std::shared_ptr<const NodeUpdater>>> updater_map;
+  std::vector<shared_ptr<const NodeUpdater>> universal_listener;
+  unordered_map<int, std::vector<std::shared_ptr<const NodeUpdater>>>
+      updater_map;
   for (auto &updater : updater_list) {
     if (updater->listenAllKind()) {
       universal_listener.emplace_back(updater);
@@ -39,8 +42,9 @@ void update(Node *root, const std::vector<std::shared_ptr<const NodeUpdater>> &u
       if (updater_map.find(n->getType()) != updater_map.end()) {
         auto it = updater_map.at(n->getType()).begin();
         auto jt = universal_listener.begin();
-        while (n->getType() == orig_type && (it != updater_map.at(orig_type).end())
-            && (jt != universal_listener.end())) {
+        while (n->getType() == orig_type &&
+               (it != updater_map.at(orig_type).end()) &&
+               (jt != universal_listener.end())) {
 
           if (it->get()->getPriority() > jt->get()->getPriority()) {
             if (it->get()->handle(n)) {
@@ -54,13 +58,15 @@ void update(Node *root, const std::vector<std::shared_ptr<const NodeUpdater>> &u
             jt++;
           }
         }
-        while ((n->getType() == orig_type) && (it != updater_map.at(orig_type).end())) {
+        while ((n->getType() == orig_type) &&
+               (it != updater_map.at(orig_type).end())) {
           if (it->get()->handle(n)) {
             n->setStatus(1);
           }
           it++;
         }
-        while ((n->getType() == orig_type) && (jt != universal_listener.end())) {
+        while ((n->getType() == orig_type) &&
+               (jt != universal_listener.end())) {
           if (jt->get()->handle(n)) {
             n->setStatus(1);
           }
@@ -94,4 +100,4 @@ void update(Node *root, const std::vector<std::shared_ptr<const NodeUpdater>> &u
     }
   }
 }
-}
+} // namespace cas
